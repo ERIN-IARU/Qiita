@@ -5,7 +5,7 @@ def syntaxget():
     syntax = syntax.replace(' ','*')
     return porandmake(syntax)
 #   逆ポーランド記法への変換
-def porandmake(self,syntax):
+def porandmake(syntax):
     length = len(syntax)
     if length < 2:
         return syntax
@@ -36,8 +36,8 @@ def porandmake(self,syntax):
 
         elif deep == 0:
             if syntax[ct] == '+' or syntax[ct] == '-':
-                former = self.porandmake(self,syntax[0:ct])
-                latter = self.porandmake(self,syntax[ct+1:length])
+                former = porandmake(syntax[0:ct])
+                latter = porandmake(syntax[ct+1:length])
                 sign = 1
                 return [former,latter,syntax[ct]]
         ct = ct + 1
@@ -69,12 +69,11 @@ def porandmake(self,syntax):
                         st = ct
 
             if level == 2 :
-                former = self.porandmake(self,syntax[0:st+1])
-                latter = self.porandmake(self,syntax[st+1:length])
-                return [former,latter,'*']
-            elif syntax[ct] == '*':
-                former = self.porandmake(self,syntax[0:ct])
-                latter = self.porandmake(self,syntax[ct+1:length])
+                former = porandmake(syntax[0:st+1])
+                latter = porandmake(syntax[st+1:length])
                 return [former,latter,'*']
             ct = ct + 1
     return syntax
+
+syntax = syntaxget()
+print(syntax)
