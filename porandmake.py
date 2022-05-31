@@ -1,9 +1,11 @@
 
+#　キーボードからの入力
 def syntaxget():
     syntax = input("式を入力してください\n")
     syntax = syntax.replace(' ','')
     syntax = syntax.replace(' ','*')
     return porandmake(syntax)
+
 #   逆ポーランド記法への変換
 def porandmake(syntax):
     length = len(syntax)
@@ -12,6 +14,8 @@ def porandmake(syntax):
     #
     ct = 0
     deep = 0
+
+    #　処理１
     while ct < length:
         if syntax[ct] == '(':
             deep = deep + 1
@@ -24,10 +28,12 @@ def porandmake(syntax):
                 length = length - 2
             break
         ct = ct + 1
-    #
+    
     sign = 0
     deep = 0
     ct = 0
+
+    #　処理２
     while ct < length:
         if syntax[ct] == '(':
            deep = deep + 1
@@ -41,7 +47,8 @@ def porandmake(syntax):
                 sign = 1
                 return [former,latter,syntax[ct]]
         ct = ct + 1
-    #
+    
+    #　処理３
     ct = 0
     if sign == 0:
         level = 0
@@ -73,6 +80,7 @@ def porandmake(syntax):
                 latter = porandmake(syntax[st+1:length])
                 return [former,latter,'*']
             ct = ct + 1
+        
     return syntax
 
 syntax = syntaxget()
