@@ -1,30 +1,30 @@
 
 #　キーボードからの入力
-def syntaxget():
-    syntax = input("式を入力してください\n")
-    syntax = syntax.replace(' ','')
-    syntax = syntax.replace(' ','*')
-    return porandmake(syntax)
+def get_formula():
+    formula = input("式を入力してください\n")
+    formula = formula.replace(' ','')
+    formula = formula.replace('*','')
+    return convert_formula_to_rpn(formula)
 
 #   逆ポーランド記法への変換
-def porandmake(syntax):
-    length = len(syntax)
+def convert_formula_to_rpn(formula):
+    length = len(formula)
     if length < 2:
-        return syntax
-    #
+        return formula
+
     ct = 0
     deep = 0
 
-    #　処理１
+    #　不要な括弧の除去
     while ct < length:
-        if syntax[ct] == '(':
+        if formula[ct] == '(':
             deep = deep + 1
-        elif syntax[ct] == ')':
+        elif formula[ct] == ')':
             deep = deep - 1
             
         if deep == 0:
             if ct >= length-1:
-                syntax = syntax[1:length-1]
+                formula = formula[1:length-1]
                 length = length - 2
             break
         ct = ct + 1
@@ -33,31 +33,31 @@ def porandmake(syntax):
     deep = 0
     ct = 0
 
-    #　処理２
+    #　演算子の検出　＋、ー
     while ct < length:
-        if syntax[ct] == '(':
+        if formula[ct] == '(':
            deep = deep + 1
-        elif syntax[ct] == ')':
+        elif formula[ct] == ')':
                 deep = deep - 1
 
         elif deep == 0:
-            if syntax[ct] == '+' or syntax[ct] == '-':
-                former = porandmake(syntax[0:ct])
-                latter = porandmake(syntax[ct+1:length])
+            if formula[ct] == '+' or formula[ct] == '-':
+                former = convert_formula_to_rpn(formula[0:ct])
+                latter = convert_formula_to_rpn(formula[ct+1:length])
                 sign = 1
-                return [former,latter,syntax[ct]]
+                return [former,latter,formula[ct]]
         ct = ct + 1
     
-    #　処理３
+    #　演算子の検出　＊
     ct = 0
     if sign == 0:
         level = 0
         st = 0
         while ct < length:
-            if syntax[ct] == '(':
+            if formula[ct] == '(':
                 deep = deep + 1
 
-            elif syntax[ct] == ')':
+            elif formula[ct] == ')':
                 deep = deep - 1
                 if deep == 0:
                     level = level + 1
@@ -65,8 +65,8 @@ def porandmake(syntax):
                         st = ct
                     
             elif deep == 0 :
-                if ct + 1 < length and syntax[ct].isdigit():
-                    if syntax[ct+1].isdigit() == False:
+                if ct + 1 < length and formula[ct].isdigit():
+                    if formula[ct+1].isdigit() == False:
                         level = level + 1
                         if level == 1:
                             st = ct
@@ -76,12 +76,12 @@ def porandmake(syntax):
                         st = ct
 
             if level == 2 :
-                former = porandmake(syntax[0:st+1])
-                latter = porandmake(syntax[st+1:length])
+                former = convert_formula_to_rpn(formula[0:st+1])
+                latter = convert_formula_to_rpn(formula[st+1:length])
                 return [former,latter,'*']
             ct = ct + 1
         
-    return syntax
+    return formula
 
-syntax = syntaxget()
-print(syntax)
+formula = get_formula()
+print(formula)
