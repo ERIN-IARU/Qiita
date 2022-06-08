@@ -4,20 +4,20 @@ def get_formula():
     return convert_to_rpn(input("式を入力してください\n").replace(' ',''))
 
 #   逆ポーランド記法への変換
-def convert_to_rpn(formula):
-    length = len(formula)
+def convert_to_rpn(expr):
+    length = len(expr)
     if length < 2:
-        return formula
+        return expr
 
-    #　不要な括弧の除去
-    if find_brackets(formula) == length-1:
-        formula = formula[1:-1]
+    if find_brackets(expr) == length-1:
+        expr = expr[1:-1]
     
-    return find_add_sub(formula) or find_mul(formula) or formula
+    return find_add_sub(expr) or find_mul(expr) or expr
 
-def find_brackets(formula):
+    #　不要な括弧の検出
+def find_brackets(expr):
     deep = 0
-    for ct, c in enumerate(formula):
+    for ct, c in enumerate(expr):
         if c == '(':
             deep += 1
         elif c == ')':
@@ -29,24 +29,24 @@ def find_brackets(formula):
     return ct
 
     #　演算子の検出　＋、ー
-def find_add_sub(formula):
+def find_add_sub(expr):
     deep = 0
-    for ct,word in enumerate(formula):
-        if word == '(':
+    for ct, c in enumerate(expr):
+        if c == '(':
            deep += 1
-        elif word == ')':
+        elif c == ')':
                 deep += 1
         elif deep == 0:
-            if word in '+-':
-                return [convert_to_rpn(formula[:ct]),convert_to_rpn(formula[ct+1:]),formula[ct]]
+            if c in '+-':
+                return [convert_to_rpn(expr[:ct]),convert_to_rpn(expr[ct+1:]),c]
     return None
 
     #　演算子の検出　＊
-def find_mul(formula):
-    length = len(formula)
+def find_mul(expr):
+    length = len(expr)
     level = 0
     deep = 0
-    for ct, c in enumerate(formula):
+    for ct, c in enumerate(expr):
         if c == '(':
             deep += 1
         elif c == ')':
@@ -54,9 +54,9 @@ def find_mul(formula):
 
         if deep == 0:
             if c == '*':
-                return [convert_to_rpn(formula[:ct]),convert_to_rpn(formula[ct+1:]),'*']
+                return [convert_to_rpn(expr[:ct]),convert_to_rpn(expr[ct+1:]),'*']
             if ct + 1 < length and c.isdigit():
-                if formula[ct+1].isdigit() == False:
+                if expr[ct+1].isdigit() == False:
                     level += 1
                     if level == 1:
                         st = ct
@@ -65,8 +65,8 @@ def find_mul(formula):
                 if level == 1:
                     st = ct
         if level == 2:
-            return [convert_to_rpn(formula[:st+1]),convert_to_rpn(formula[st+1:]),'*']
+            return [convert_to_rpn(expr[:st+1]),convert_to_rpn(expr[st+1:]),'*']
     return None
 
-formula = get_formula()
-print(formula)
+expr = get_formula()
+print(expr)
