@@ -1,87 +1,72 @@
 
 #　キーボードからの入力
 def get_formula():
-    formula = input("式を入力してください\n")
-    formula = formula.replace(' ','')
-    formula = formula.replace('*','')
-    return convert_formula_to_rpn(formula)
+    return convert_to_rpn(input("式を入力してください\n").replace(' ',''))
 
 #   逆ポーランド記法への変換
-def convert_formula_to_rpn(formula):
+def convert_to_rpn(formula):
     length = len(formula)
     if length < 2:
         return formula
 
-    ct = 0
-    deep = 0
-
     #　不要な括弧の除去
-    while ct < length:
-        if formula[ct] == '(':
-            deep = deep + 1
-        elif formula[ct] == ')':
-            deep = deep - 1
-            
-        if deep == 0:
-            if ct >= length-1:
-                formula = formula[1:length-1]
-                length = length - 2
-            break
-        ct = ct + 1
+    if find_brackets(formula) == length-1:
+        formula = formula[1:-1]
     
-    sign = 0
+    return find_add_sub(formula) or find_mul(formula) or formula
+
+def find_brackets(formula):
     deep = 0
-    ct = 0
+    for ct, c in enumerate(formula):
+        if c == '(':
+            deep += 1
+        elif c == ')':
+            deep -= 1
+
+        if deep == 0:
+            break
+
+    return ct
 
     #　演算子の検出　＋、ー
-    while ct < length:
-        if formula[ct] == '(':
-           deep = deep + 1
-        elif formula[ct] == ')':
-                deep = deep - 1
-
+def find_add_sub(formula):
+    deep = 0
+    for ct,word in enumerate(formula):
+        if word == '(':
+           deep += 1
+        elif word == ')':
+                deep += 1
         elif deep == 0:
-            if formula[ct] == '+' or formula[ct] == '-':
-                former = convert_formula_to_rpn(formula[0:ct])
-                latter = convert_formula_to_rpn(formula[ct+1:length])
-                sign = 1
-                return [former,latter,formula[ct]]
-        ct = ct + 1
-    
+            if word in '+-':
+                return [convert_to_rpn(formula[:ct]),convert_to_rpn(formula[ct+1:]),formula[ct]]
+    return None
+
     #　演算子の検出　＊
-    ct = 0
-    if sign == 0:
-        level = 0
-        st = 0
-        while ct < length:
-            if formula[ct] == '(':
-                deep = deep + 1
+def find_mul(formula):
+    length = len(formula)
+    level = 0
+    deep = 0
+    for ct, c in enumerate(formula):
+        if c == '(':
+            deep += 1
+        elif c == ')':
+            deep -=  1
 
-            elif formula[ct] == ')':
-                deep = deep - 1
-                if deep == 0:
-                    level = level + 1
+        if deep == 0:
+            if c == '*':
+                return [convert_to_rpn(formula[:ct]),convert_to_rpn(formula[ct+1:]),'*']
+            if ct + 1 < length and c.isdigit():
+                if formula[ct+1].isdigit() == False:
+                    level += 1
                     if level == 1:
                         st = ct
-                    
-            elif deep == 0 :
-                if ct + 1 < length and formula[ct].isdigit():
-                    if formula[ct+1].isdigit() == False:
-                        level = level + 1
-                        if level == 1:
-                            st = ct
-                else :
-                    level = level + 1
-                    if level == 1:
-                        st = ct
-
-            if level == 2 :
-                former = convert_formula_to_rpn(formula[0:st+1])
-                latter = convert_formula_to_rpn(formula[st+1:length])
-                return [former,latter,'*']
-            ct = ct + 1
-        
-    return formula
+            else :
+                level += 1
+                if level == 1:
+                    st = ct
+        if level == 2:
+            return [convert_to_rpn(formula[:st+1]),convert_to_rpn(formula[st+1:]),'*']
+    return None
 
 formula = get_formula()
 print(formula)
